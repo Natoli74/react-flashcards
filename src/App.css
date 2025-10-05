@@ -100,7 +100,6 @@ body {
   color: var(--muted);
 }
 
-
 /* Flashcard container */
 .flashcard-container {
   display: flex;
@@ -312,6 +311,13 @@ body {
   transform: translateY(0);
 }
 
+.control-button.disabled,
+.control-button[aria-disabled="true"] {
+  opacity: 0.45;
+  pointer-events: none;
+  transform: none;
+}
+
 .card-counter {
   background: rgba(30, 41, 59, 0.8);
   border: 2px solid rgba(124, 92, 255, 0.3);
@@ -322,6 +328,55 @@ body {
   font-size: clamp(0.875rem, 1.5vw, 1.125rem);
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Guess input area */
+.guess-form {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1.25rem;
+}
+
+.guess-input {
+  min-width: 320px;
+  max-width: 560px;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-primary);
+  outline: none;
+  transition: box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.guess-input:focus {
+  box-shadow: 0 6px 30px rgba(124, 92, 255, 0.12);
+  border-color: rgba(124, 92, 255, 0.4);
+}
+
+.feedback {
+  font-weight: 700;
+  padding: 0.45rem 0.75rem;
+  border-radius: 0.5rem;
+  color: white;
+}
+
+.feedback.correct {
+  background: linear-gradient(90deg, #16a34a, #4ade80);
+}
+
+.feedback.incorrect {
+  background: linear-gradient(90deg, #dc2626, #f97316);
+}
+
+.guess-input.correct {
+  border-color: rgba(16, 185, 129, 0.6);
+}
+
+.guess-input.incorrect {
+  border-color: rgba(239, 68, 68, 0.6);
 }
 
 /* Footer tip */
@@ -387,6 +442,10 @@ body {
     padding: 1.5rem 0.75rem;
   }
 
+
+  .visually-hidden{
+    font-size: smaller;
+  }
   .content-wrapper {
     padding: 1.25rem;
   }

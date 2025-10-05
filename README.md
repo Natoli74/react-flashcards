@@ -8,32 +8,39 @@ React Flashcards is a single-page React + Vite application that provides a focus
 
 ---
 
-## Completed Features (high level)
+## Requirements Checklist
 
-The following functionality is implemented in this project:
+Required features implemented:
 
-- [x] Single-card view with question (front) and answer (back) that flips on click.
-- [x] Randomized card order on load and a Shuffle & Restart control.
-- [x] Next / Previous navigation including keyboard support (← / →) and Enter/Space to flip.
-- [x] Responsive layout and accessible attributes for interactive elements.
+- [x] The user can enter their guess into an input box before seeing the flipside of the card
+- [x] Application features a clearly labeled input box with a submit button where users can type in a guess
+- [x] Clicking on the submit button with an incorrect answer shows visual feedback that it is wrong
+- [x] Clicking on the submit button with a correct answer shows visual feedback that it is correct
+- [x] The user can navigate through an ordered list of cards
+- [x] A forward/next button displayed on the card navigates to the next card in a set sequence when clicked
+- [x] A previous/back button displayed on the card returns to the previous card in the set sequence when clicked
+- [x] Both the next and back buttons have visual indication and are disabled at the ends (no wrap-around)
 
-Optional / UX improvements implemented:
+Optional / Stretch features implemented:
 
-- [x] Category visual accents (Basics / Intermediate / Advanced) and a legend.
-- [x] Smooth flip/transition animations and a subtle glass-like UI treatment.
-- [x] Polished controls (buttons, counters) and improved visual hierarchy.
+- [x] Users can use a shuffle button to randomize the order of the cards ("Shuffle")
+- [x] Cards remain in the same sequence (NOT randomized) unless the shuffle button is clicked
+- [x] A user’s answer may be counted as correct even when it is slightly different from the target answer (case-insensitive, punctuation ignored, partial match accepted)
 
 ---
+
+Notes:
+
+- Subtle UI feedback is implemented with colored badges for correct/incorrect answers and input border colors.
+- The submit action reveals the answer side of the card so users can compare their guess to the card answer.
 
 ## Video Walkthrough
 
 Here's a walkthrough of implemented features:
 
-<img src='src/assets/web102_p2.gif' title='Video Walkthrough' width='600' alt='Video Walkthrough'/>
+<img src='src/assets/web102_p3.gif' title='Video Walkthrough' width='600' alt='Video Walkthrough'/>
 
-GIF created with [Ezgif](https://ezgif.com/) 
-
-
+GIF created with [Ezgif](https://ezgif.com/)
 
 ---
 
@@ -69,7 +76,6 @@ GIF created with [Ezgif](https://ezgif.com/)
 - Accessibility: interactive card wrapper uses `role="button"`, `tabIndex={0}`, and keyboard handlers for Enter/Space and arrow navigation.
 - UX: the app includes shuffle/random selection, a visible counter, and a category legend to give quick context.
 - Styling: implemented with plain CSS in `src/App.css` (no external CSS framework). The design uses gradients, glass-like panels, and responsive sizing.
-
 
 ---
 

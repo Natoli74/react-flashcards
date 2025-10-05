@@ -76,6 +76,12 @@ function App() {
         "A lightweight in-memory tree of React elements that React diffs against to compute minimal real DOM updates.",
       category: "advanced",
     },
+    // Added one-word answer card for quick submit testing
+    {
+      question: "What HTML tag creates a paragraph? (one-word)",
+      answer: "p",
+      category: "basics",
+    },
   ];
 
   // shuffle helper (Fisher-Yates)
@@ -95,30 +101,40 @@ function App() {
     cards: rawCards,
   };
 
-  const total = cardSet.cards.length;
-  const [cards, setCards] = useState(() => shuffle(cardSet.cards));
+  const totalCards = cardSet.cards.length;
+  // Keep an ordered deck by default (requirement: cards remain in sequence unless shuffled)
+  const [cards, setCards] = useState(cardSet.cards.slice());
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
 
+  // Guess input state and feedback
+  const [guess, setGuess] = useState("");
+  const [feedback, setFeedback] = useState(null);
+
   function flip() {
     setFlipped((f) => !f);
+    // clear feedback when flipping
+    setFeedback(null);
   }
 
   function nextCard() {
-    // Pick a random card (requirement: "random new card")
-    const randomIndex = Math.floor(Math.random() * total);
-    setIndex(randomIndex);
-    setFlipped(false);
+    // Ordered navigation: don't wrap around; disable at end
+    if (index < cards.length - 1) {
+      setIndex(index + 1);
+      setFlipped(false);
+      setGuess("");
+      setFeedback(null);
+    }
   }
 
   function prevCard() {
-    if (total <= 1) {
+    // Ordered navigation: don't wrap around; disable at start
+    if (index > 0) {
+      setIndex(index - 1);
       setFlipped(false);
-      return;
+      setGuess("");
+      setFeedback(null);
     }
-    const prev = (index - 1 + total) % total;
-    setIndex(prev);
-    setFlipped(false);
   }
 
   function reshuffle() {
@@ -126,9 +142,46 @@ function App() {
     setCards(newCards);
     setIndex(0);
     setFlipped(false);
+    setGuess("");
+    setFeedback(null);
   }
 
   const current = cards[index];
+
+  // tolerant matching: normalize strings (case-insensitive, remove punctuation)
+  function normalizeAnswer(text) {
+    return (text || "")
+      .toLowerCase()
+      .replace(/[.,/#!$%^&*;:{}=\-_`~()"'?<>\[\]\\]/g, "")
+      .trim();
+  }
+
+  function checkAnswer(userGuess, correctAnswer) {
+    const ng = normalizeAnswer(userGuess);
+    const na = normalizeAnswer(correctAnswer);
+    if (!ng) return false;
+
+    // exact match
+    if (ng === na) return true;
+
+    // For very short guesses (1-2 chars) require a whole-token match or exact equality
+    if (ng.length <= 2) {
+      const naTokens = na.split(/\s+/);
+      if (naTokens.includes(ng)) return true;
+      return false;
+    }
+
+    // For longer guesses allow partial match (user typed a substring of the answer)
+    return na.includes(ng);
+  }
+
+  function submitGuess(e) {
+    e?.preventDefault?.();
+    const isCorrect = checkAnswer(guess, current.answer);
+    setFeedback(isCorrect ? "correct" : "incorrect");
+    // reveal the answer on submit
+    setFlipped(true);
+  }
 
   // Get color based on category
   const getCategoryClass = (category) => {
@@ -147,7 +200,7 @@ function App() {
         <header className="app-header">
           <h1 className="title">{cardSet.title}</h1>
           <p className="description">{cardSet.description}</p>
-          <p className="meta">{total} cards • randomized</p>
+          <p className="meta">{totalCards} cards • ordered</p>
         </header>
 
         <main>
@@ -182,7 +235,11 @@ function App() {
               aria-pressed={flipped}
             >
               {/* Front of card - shows question */}
-              <div className={`card-side card-front ${getCategoryClass(current.category)} ${flipped ? "hidden" : "visible"}`}>
+              <div
+                className={`card-side card-front ${getCategoryClass(
+                  current.category
+                )} ${flipped ? "hidden" : "visible"}`}
+              >
                 <div className="card-content">
                   <h2 className="card-label">Question</h2>
                   <p className="card-text">{current.question}</p>
@@ -191,7 +248,11 @@ function App() {
               </div>
 
               {/* Back of card - shows answer */}
-              <div className={`card-side card-back ${getCategoryClass(current.category)} ${flipped ? "visible" : "hidden"}`}>
+              <div
+                className={`card-side card-back ${getCategoryClass(
+                  current.category
+                )} ${flipped ? "visible" : "hidden"}`}
+              >
                 <div className="card-content">
                   <h2 className="card-label">Answer</h2>
                   <p className="card-text">{current.answer}</p>
@@ -211,16 +272,55 @@ function App() {
 
           {/* Controls */}
           <div className="controls">
-            <button onClick={nextCard} className="control-button primary">
-              Next Random Card
+            <button
+              onClick={nextCard}
+              className={`control-button primary ${
+                index >= cards.length - 1 ? "disabled" : ""
+              }`}
+              aria-disabled={index >= cards.length - 1}
+            >
+              Next
             </button>
-            <button onClick={reshuffle} className="control-button secondary">
-              Shuffle & Restart
+            <button
+              onClick={prevCard}
+              className={`control-button secondary ${
+                index <= 0 ? "disabled" : ""
+              }`}
+              aria-disabled={index <= 0}
+            >
+              Previous
+            </button>
+            <button onClick={reshuffle} className="control-button tertiary">
+              Shuffle
             </button>
             <div className="card-counter">
-              {index + 1} / {total}
+              {index + 1} / {totalCards}
             </div>
           </div>
+
+          {/* Guess input and submit */}
+          <form className="guess-form" onSubmit={submitGuess}>
+            <label htmlFor="guess-input" className="visually-hidden">
+              Enter your guess
+            </label>
+            <input
+              id="guess-input"
+              className={`guess-input ${feedback || ""}`}
+              value={guess}
+              autoComplete="off"
+              onChange={(e) => setGuess(e.target.value)}
+              placeholder="Type your guess here..."
+            />
+            <button type="submit" className="control-button primary">
+              Submit
+            </button>
+            {feedback === "correct" && (
+              <div className="feedback correct">Correct ✓</div>
+            )}
+            {feedback === "incorrect" && (
+              <div className="feedback incorrect">Incorrect ✕</div>
+            )}
+          </form>
 
           <footer className="footer-tip">
             💡 Tip: Click the card or press Enter to flip • Use ← / → arrows to
