@@ -1,4 +1,4 @@
-# WEB102 Project 2 — React Flashcards (React Basics)
+# WEB102 Project 3 — React Flashcards (React Basics) Pt. 2
 
 Submitted by: **Natoli Tesgera**
 
